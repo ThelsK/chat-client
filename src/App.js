@@ -1,9 +1,12 @@
 import React from "react"
 import request from "superagent"
 import { serverUrl } from "./constants"
+import InputField from "./components/InputField"
+import Message from "./components/Message"
 
 class App extends React.Component {
   state = {
+    messages: [],
     inputField: ""
   }
 
@@ -28,27 +31,29 @@ class App extends React.Component {
       .catch(console.error)
   }
 
-
   componentDidMount() {
     this.source.onmessage = event => {
       const messages = JSON.parse(event.data)
+      this.setState({ messages })
       console.log("Messages:", messages)
     }
   }
 
   render() {
     return (
-      <div className="App">
-        <form onSubmit={this.onSubmit}>
-          <input
-            name="inputField"
-            type="text"
-            value={this.state.inputField}
-            onChange={this.onChange}
+      <main className="App">
+        {this.state.messages.map((message, index) =>
+          <Message
+            key={index}
+            message={message}
           />
-          <button>Send</button>
-        </form>
-      </div>
+        )}
+        < InputField
+          values={this.state}
+          onChange={this.onChange}
+          onSubmit={this.onSubmit}
+        />
+      </main>
     )
   }
 }
