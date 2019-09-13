@@ -23,7 +23,6 @@ class App extends React.Component {
     request.post(`${serverUrl}/message`)
       .send({ text: this.state.inputField })
       .then(res => {
-        console.log(res)
         this.setState({
           inputField: ""
         })
@@ -33,19 +32,20 @@ class App extends React.Component {
 
   componentDidMount() {
     this.source.onmessage = event => {
-      const messages = JSON.parse(event.data)
-      this.setState({ messages })
-      console.log("Messages:", messages)
+      this.setState({
+        messages: this.state.messages
+          .concat(JSON.parse(event.data))
+      })
     }
   }
 
   render() {
     return (
       <main className="App">
-        {this.state.messages.map((message, index) =>
+        {this.state.messages.map(message =>
           <Message
-            key={index}
-            message={message}
+            key={message.id}
+            message={message.text}
           />
         )}
         < InputField

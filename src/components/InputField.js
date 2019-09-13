@@ -13,6 +13,3 @@ export default function InputField(props) {
     </form>
   )
 }
-
-
-
