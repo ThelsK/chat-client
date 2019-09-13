@@ -1,26 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react"
+import request from "superagent"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const serverUrl = "http://localhost:4000"
+
+class App extends React.Component {
+  state = {
+    inputField: ""
+  }
+
+  source = new EventSource(`${serverUrl}/stream`)
+
+  onChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value
+    })
+  }
+
+  onSubmit = event => {
+    event.preventDefault()
+    request.post(`${serverUrl}/message`)
+      .send({ text: this.state.inputField })
+      .then(console.log)
+      .catch(console.error)
+
+    this.setState({
+      inputField: ""
+    })
+  }
+
+  componentDidMount() {
+    this.source.onmessage = event => {
+      const messages = JSON.parse(event.data)
+      console.log("Messages:", messages)
+    }
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <form onSubmit={this.onSubmit}>
+          <input
+            name="inputField"
+            type="text"
+            value={this.state.inputField}
+            onChange={this.onChange}
+          />
+          <button>Send</button>
+        </form>
+      </div>
+    )
+  }
 }
 
-export default App;
+export default App
