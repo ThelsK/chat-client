@@ -1,7 +1,6 @@
 import React from "react"
 import request from "superagent"
-
-const serverUrl = "http://localhost:4000"
+import { serverUrl } from "./constants"
 
 class App extends React.Component {
   state = {
@@ -20,13 +19,15 @@ class App extends React.Component {
     event.preventDefault()
     request.post(`${serverUrl}/message`)
       .send({ text: this.state.inputField })
-      .then(console.log)
+      .then(res => {
+        console.log(res)
+        this.setState({
+          inputField: ""
+        })
+      })
       .catch(console.error)
-
-    this.setState({
-      inputField: ""
-    })
   }
+
 
   componentDidMount() {
     this.source.onmessage = event => {
